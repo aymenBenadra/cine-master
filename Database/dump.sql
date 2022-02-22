@@ -29,6 +29,7 @@ CREATE TABLE IF NOT EXISTS `Comments` (
     `post_id` INT NOT NULL,
     `author_id` INT NOT NULL,
     `content` TEXT NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`post_id`) REFERENCES `Posts` (`id`) ON DELETE CASCADE,
     FOREIGN KEY (`author_id`) REFERENCES `Users` (`id`) ON DELETE CASCADE

@@ -1,10 +1,11 @@
 {
   "name": "cine-master",
   "version": "1.0.0",
-  "description": "‘ciné master’ est une communauté d'amateurs de films et de séries souhaite renforcer sa présence sur le web.",
-  "main": "index.php",
+  "description": "ciné master est une communauté d'amateurs de films et de séries souhaite renforcer sa présence sur le web.",
+  "main": "/public/index.php",
   "repository": "https://github.com/aymenBenadra/cine-master.git",
   "author": "Mohammed-Aymen Benadra <aymanbenadra16@gmail.com>",
   "license": "MIT",
-  "private": true
+  "private": true,
+  "scripts": {}
 }

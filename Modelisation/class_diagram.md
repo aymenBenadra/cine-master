@@ -22,17 +22,21 @@ classDiagram
       + string description
       + string photo
       + string categorie
+      + int likes
       + string created_at
       + string updated_at
       + createPost() bool
       + showPost() bool
       + updatePost() bool
       + deletePost() bool
+      + likePost() void
+      + dislikePost() void
     }
 
     class Comment{
       - int id
       + string content
+      + string created_at
       + createComment() bool
       + showComment() bool
       + updateComment() bool
@@ -40,6 +44,6 @@ classDiagram
     }
             
     User <|-- Admin : May be
-    Post "1" --> "0..*" Comment : Has
-    User "1" --> "0..*" Post : Creates
+    Post "1" -- "0..*" Comment : Has
+    User "1" -- "0..*" Post : Creates
 ```

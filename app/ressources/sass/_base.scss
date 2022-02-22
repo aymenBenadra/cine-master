@@ -1,0 +1,19 @@
+$font-montserrat: "Montserrat", sans-serif;
+
+$color-primary: #23a6f0;
+$color-text: #252b42;
+$color-text-second: #737373;
+$color-disabled-element: #8ec2f2;
+$color-edit: #29cc97;
+$color-delete: #f12b2c;
+$color-main-bg: #f7f8fc;
+$color-light: #ffffff;
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: $font-montserrat;
+  scroll-behavior: smooth;
+}
