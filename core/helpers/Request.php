@@ -49,7 +49,7 @@ class Request
                 return empty($_GET) ? [] : $_GET;
                 break;
             case 'POST':
-                return $_POST;
+                return empty($_FILES) ? $_POST : array_merge($_POST, $_FILES);
                 break;
             // case 'PUT':
             //     parse_str(file_get_contents('php://input'), $_PUT);

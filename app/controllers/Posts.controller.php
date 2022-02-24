@@ -28,7 +28,34 @@ class Posts extends Controller
     {
         $posts = $this->model->getAll();
 
+        session_start();
         $this->view('posts/index', compact('posts'));
+    }
+
+    /**
+     * Go to Posts index page
+     *
+     * @return void
+     */
+    public function category($data = [])
+    {
+        try {
+            if (empty($data) || !isset($data['cat'])) {
+                throw new Exception('Posts Category is not specified');
+            }
+            extract($data);
+
+            if ($cat != 1 && $cat != 2) {
+                throw new Exception('Category ID is not valid');
+            }
+
+            $posts = $this->model->getAllBy("category_id", $cat);
+
+            session_start();
+            $this->view('posts/index', compact('posts', 'cat'));
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
     }
 
     /**
@@ -49,7 +76,15 @@ class Posts extends Controller
             if (!$post) {
                 throw new Exception('Post does not exist');
             } else {
-                $this->view('posts/show', compact('post'));
+                // Getting comments for this post
+                $comments = $this->model('Comment')->getAllBy('post_id', $data['id']);
+
+                if(!$comments) {
+                    $comments = [];
+                }
+
+                session_start();
+                $this->view('posts/show', compact('post', 'comments'));
             }
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -63,6 +98,7 @@ class Posts extends Controller
      */
     public function create()
     {
+        session_start();
         $this->view('posts/create');
     }
 
@@ -84,7 +120,8 @@ class Posts extends Controller
             if (!$post) {
                 throw new Exception('Post does not exist');
             } else {
-                $this->view('posts/edit', compact('id', 'post'));
+                session_start();
+                $this->view('posts/edit', compact('post'));
             }
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -100,7 +137,7 @@ class Posts extends Controller
     public function store($data = [])
     {
         try {
-            switch(true){
+            switch (true) {
                 case empty($data):
                     throw new Exception('Post data is not specified');
                 case !isset($data['title']):
@@ -113,10 +150,12 @@ class Posts extends Controller
                     throw new Exception('Post category is not specified');
             }
 
+            $data['photo'] = $this->uploadPhoto($data['photo']);
+
             if (!$this->model->add($data)) {
                 throw new Exception('Arrgh! Something went wrong');
             } else {
-                Router::redirect('/public/post?id=' . $this->model->getLastInsertedId());
+                Router::redirect('/post?id=' . $this->model->getLastInsertedId());
             }
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -132,7 +171,7 @@ class Posts extends Controller
     public function update($data = [])
     {
         try {
-            switch(true){
+            switch (true) {
                 case empty($data):
                     throw new Exception('Post data is not specified');
                 case !isset($data['title']):
@@ -145,28 +184,19 @@ class Posts extends Controller
                     throw new Exception('Post category is not specified');
             }
 
+            $data['photo'] = $this->uploadPhoto($data['photo']);
+
             $id = $data['id'];
             unset($data['id']);
 
             if (!$this->model->update($id, $data)) {
                 throw new Exception('Arrgh! Something went wrong');
             } else {
-                Router::redirect('/public/post?id=' . $id);
+                Router::redirect('/post?id=' . $id);
             }
         } catch (Exception $e) {
             echo $e->getMessage();
         }
-    }
-
-    /**
-     * Delete Post from database
-     *
-     * @param  mixed $data
-     * @return void
-     */
-    public function delete()
-    {
-        $this->view('posts/delete');
     }
 
     /**
@@ -185,7 +215,7 @@ class Posts extends Controller
             if (!$this->model->delete($data['id'])) {
                 throw new Exception('Arrgh! Something went wrong');
             } else {
-                Router::redirect('/public/posts');
+                Router::redirect('/');
             }
         } catch (Exception $e) {
             echo $e->getMessage();

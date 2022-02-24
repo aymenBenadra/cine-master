@@ -70,6 +70,7 @@ class Users extends Controller
 
         if ($user) {
             if (password_verify($password, $user->password)) {
+                unset($user->password);
                 session_start();
                 $_SESSION['user'] = serialize($user);
                 Router::redirect('/');
@@ -105,6 +106,7 @@ class Users extends Controller
             exit;
         }
 
+        // Check if user with same username or email exists
         $user = $this->model->getBy('email', $email);
 
         if ($user) {
@@ -125,7 +127,8 @@ class Users extends Controller
             'username' => $username,
             'email' => $email,
             'password' => password_hash($password, PASSWORD_DEFAULT),
-            'admin' => 0
+            'admin' => 0,
+            'avatar' => $this->uploadPhoto($avatar)
         ]);
 
         if ($user) {
@@ -139,6 +142,18 @@ class Users extends Controller
     }
 
     /**
+     * Logout user and redirect to home page
+     * 
+     * @return void
+     */
+    public function logout()
+    {
+        session_start();
+        session_destroy();
+        Router::redirect('/');
+    }
+
+    /**
      * Go to User Profile page if logged in or to login page if not
      *
      * @param  mixed $data
@@ -149,24 +164,19 @@ class Users extends Controller
         session_start();
         if (isset($_SESSION['user'])) {
             $user = unserialize($_SESSION['user']);
-            $this->view('users/profile', compact('user'));
+            $posts = $this->model('Post')->getAllBy('author_id', $user->id);
+            if ($posts) {
+                $this->view('users/profile', compact('user', 'posts'));
+            } else {
+                $this->view('users/profile', compact('user'));
+            }
         } else {
             $this->view('users/login');
         }
     }
 
     /**
-     * Go to Post creation page
-     *
-     * @return void
-     */
-    public function create()
-    {
-        $this->view('posts/create');
-    }
-
-    /**
-     * Go to Post edit page
+     * Go to User edit page
      *
      * @param  mixed $data
      * @return void
@@ -175,17 +185,18 @@ class Users extends Controller
     {
         try {
             if (empty($data) || !isset($data['id'])) {
-                throw new Exception('Post ID is not specified');
+                throw new Exception('User ID is not specified');
             }
 
             extract($data);
 
-            $post = $this->model->get($id);
+            $user = $this->model->get($id);
 
-            if (!$post) {
-                throw new Exception('Post does not exist');
+            if (!$user) {
+                throw new Exception('User does not exist');
             } else {
-                $this->view('posts/edit', compact('id', 'post'));
+                session_start();
+                $this->view('users/editProfile', compact('user'));
             }
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -193,30 +204,7 @@ class Users extends Controller
     }
 
     /**
-     * Store new Post record in database
-     *
-     * @param  mixed $data
-     * @return void
-     */
-    public function store($data = [])
-    {
-        try {
-            if (empty($data) || !isset($data['title'])) {
-                throw new Exception('Post data is not specified');
-            }
-
-            if (!$this->model->add($data)) {
-                throw new Exception('Arrgh! Something went wrong');
-            } else {
-                Router::redirect('/public/post?id=' . $this->model->getLastInsertedId());
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
-        }
-    }
-
-    /**
-     * Update existing Post in database
+     * Update existing User in database
      *
      * @param  mixed $data
      * @return void
@@ -225,17 +213,39 @@ class Users extends Controller
     {
         try {
             if (empty($data['id']) || !isset($data['id'])) {
-                throw new Exception('Post ID is not specified');
-            } else if (!isset($data['title']) || empty($data['title'])) {
-                throw new Exception('Post title is not specified');
-            }
-
-            extract($data);
-
-            if (!$this->model->update($id, compact('title'))) {
-                throw new Exception('Arrgh! Something went wrong');
+                throw new Exception('User ID is not specified');
+            } else if (!isset($data['username']) || empty($data['username'])) {
+                throw new Exception('User username is not specified');
+            } else if (!isset($data['email']) || empty($data['email'])) {
+                throw new Exception('User email is not specified');
             } else {
-                Router::redirect('/public/post?id=' . $id);
+
+                $user = $this->model->get($data['id']);
+
+                // handle avatar upload if exists in data array and update user
+                if (isset($data['avatar'])) {
+                    $data['avatar'] = $this->uploadPhoto($data['avatar']);
+                } else {
+                    $data['avatar'] = $user->avatar;
+                }
+
+                if (!$user) {
+                    throw new Exception('User does not exist');
+                } else {
+                    $id = $data['id'];
+                    unset($data['id']);
+
+                    if ($this->model->update($id, $data)) {
+                        // update session user
+                        $user = $this->model->get($id);
+                        unset($user->password);
+                        session_start();
+                        $_SESSION['user'] = serialize($user);
+                        Router::redirect('/profile');
+                    } else {
+                        throw new Exception('User could not be updated');
+                    }
+                }
             }
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -243,18 +253,7 @@ class Users extends Controller
     }
 
     /**
-     * Delete Post from database
-     *
-     * @param  mixed $data
-     * @return void
-     */
-    public function delete()
-    {
-        $this->view('posts/delete');
-    }
-
-    /**
-     * Destroy Post from database
+     * Destroy User from database
      *
      * @param  mixed $data
      * @return void
@@ -263,7 +262,7 @@ class Users extends Controller
     {
         try {
             if (empty($data) || !isset($data['id'])) {
-                throw new Exception('Post ID is not specified');
+                throw new Exception('User ID is not specified');
             }
 
             extract($data);
@@ -271,7 +270,7 @@ class Users extends Controller
             if (!$this->model->delete($id)) {
                 throw new Exception('Arrgh! Something went wrong');
             } else {
-                Router::redirect('/public/posts');
+                Router::redirect('/register');
             }
         } catch (Exception $e) {
             echo $e->getMessage();
