@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS `Users` (
     `email` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
     `admin` BOOLEAN NOT NULL DEFAULT FALSE,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    `avatar` VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `Posts` (

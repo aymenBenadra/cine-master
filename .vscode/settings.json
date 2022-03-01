@@ -12,6 +12,19 @@
             "username": "root",
             "database": "cine-master",
             "password": ""
+        },
+        {
+            "mysqlOptions": {
+                "authProtocol": "default"
+            },
+            "previewLimit": 50,
+            "server": "us-cdbr-east-05.cleardb.net",
+            "port": 3306,
+            "driver": "MySQL",
+            "password": "a56e4538",
+            "username": "ba41d251d245a8",
+            "database": "heroku_4c98996cdaefcf0",
+            "name": "Heroku ClearDB MySQL"
         }
     ]
 }
