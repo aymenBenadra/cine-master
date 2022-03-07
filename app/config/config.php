@@ -5,7 +5,7 @@
 define('DB_HOST', 'us-cdbr-east-05.cleardb.net');
 define('DB_USER', 'ba41d251d245a8');
 define('DB_PASS', 'a56e4538');
-define('DB_NAME', 'cine-master');
+define('DB_NAME', 'heroku_4c98996cdaefcf0');
 
 // App Root
 define('APPROOT', dirname(__DIR__));
