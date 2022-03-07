@@ -26,7 +26,7 @@ class Posts extends Controller
      */
     public function index()
     {
-        $posts = $this->model->getAll();
+        $posts = $this->model->getAll() ?? [];
 
         session_start();
         $this->view('posts/index', compact('posts'));
