@@ -5,6 +5,12 @@ namespace App\Controllers;
 use Core\{Controller, Router};
 use Exception;
 
+/**
+ * Users Controller
+ *
+ * @author Mohammed-Aymen Benadra
+ * @package App\Controllers
+ */
 class Users extends Controller
 {
     private $model;

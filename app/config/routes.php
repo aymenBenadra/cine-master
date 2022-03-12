@@ -66,3 +66,38 @@ $router->post('post/destroy', 'Posts@destroy'); // ✅
 $router->post('comment/store', 'Comments@store'); // ✅
 // Delete comment by ID
 $router->post('comment/destroy', 'Comments@destroy'); // ✅
+
+/**
+ * *API Routes
+ * path: app\controllers\Api.controller.php
+ * 
+ * - GET Routes
+ * - POST Routes
+ * - PUT Routes
+ * - DELETE Routes
+ */
+// Api documentation page
+$router->get('api', 'Api@index'); // ✅
+// Get all posts
+$router->get('api/posts', 'Api@posts'); // ✅
+// Get post by ID
+$router->get('api/post', 'Api@post'); // ✅
+// Get all posts by category ID
+$router->get('api/posts/category', 'Api@postsByCategory'); // ✅
+// Get all posts by user ID
+$router->get('api/posts/user', 'Api@postsByUser');
+
+// Create new post
+$router->post('api/post', 'Api@store');
+// Update post by ID
+$router->put('api/post', 'Api@update');
+// Delete post by ID
+$router->delete('api/post', 'Api@destroy');
+
+// Get all comments by post ID
+$router->get('api/comments', 'Api@comments');
+// Create new comment to post by ID
+$router->post('api/comment', 'Api@storeComment');
+// Delete comment by ID
+$router->delete('api/comment', 'Api@destroyComment');
+

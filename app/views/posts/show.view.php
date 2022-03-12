@@ -46,6 +46,7 @@
                 if (isset($data['comments']) && !empty($data['comments'])) :
                     foreach ($data['comments'] as $comment) :
                         $date = new DateTime($comment->created_at);
+                        $date = $date->add(new DateInterval('PT1H'));
                         $now = $date->diff(new DateTime())->format('%a days - %h hours - %i minutes ago');
                 ?>
                         <li class="list-group-item">

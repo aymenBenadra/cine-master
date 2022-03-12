@@ -1,7 +1,7 @@
 <?php
 
 namespace Core;
-use FFI\Exception;
+use Exception;
 
 class App
 {

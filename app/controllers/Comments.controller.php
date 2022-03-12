@@ -5,6 +5,12 @@ namespace App\Controllers;
 use Core\{Controller, Router};
 use Exception;
 
+/**
+ * Comments Controller
+ *
+ * @author Mohammed-Aymen Benadra
+ * @package App\Controllers
+ */
 class Comments extends Controller
 {
     private $model;

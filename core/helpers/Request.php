@@ -51,14 +51,14 @@ class Request
             case 'POST':
                 return empty($_FILES) ? $_POST : array_merge($_POST, $_FILES);
                 break;
-            // case 'PUT':
-            //     parse_str(file_get_contents('php://input'), $_PUT);
-            //     return $_PUT;
-            //     break;
-            // case 'DELETE':
-            //     parse_str(file_get_contents('php://input'), $_DELETE);
-            //     return $_DELETE;
-            //     break;
+            case 'PUT':
+                parse_str(file_get_contents('php://input'), $_PUT);
+                return $_PUT;
+                break;
+            case 'DELETE':
+                parse_str(file_get_contents('php://input'), $_DELETE);
+                return $_DELETE;
+                break;
             default:
                 return [];
                 break;

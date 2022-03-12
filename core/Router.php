@@ -22,9 +22,9 @@ class Router
      */
     public $routes = [
         'GET' => [],
-        'POST' => []
-        // 'PUT' => [],
-        // 'DELETE' => []
+        'POST' => [],
+        'PUT' => [],
+        'DELETE' => []
     ];
 
     /**
@@ -66,27 +66,27 @@ class Router
         $this->routes['POST'][$uri] = $controller;
     }
 
-    // /**
-    //  * Register a PUT route.
-    //  *
-    //  * @param string $uri
-    //  * @param string $controller
-    //  */
-    // public function put($uri, $controller)
-    // {
-    //     $this->routes['PUT'][$uri] = $controller;
-    // }
+    /**
+     * Register a PUT route.
+     *
+     * @param string $uri
+     * @param string $controller
+     */
+    public function put($uri, $controller)
+    {
+        $this->routes['PUT'][$uri] = $controller;
+    }
 
-    // /**
-    //  * Register a DELETE route.
-    //  *
-    //  * @param string $uri
-    //  * @param string $controller
-    //  */
-    // public function delete($uri, $controller)
-    // {
-    //     $this->routes['DELETE'][$uri] = $controller;
-    // }
+    /**
+     * Register a DELETE route.
+     *
+     * @param string $uri
+     * @param string $controller
+     */
+    public function delete($uri, $controller)
+    {
+        $this->routes['DELETE'][$uri] = $controller;
+    }
 
     /**
      * Load the requested URI's associated controller method.
