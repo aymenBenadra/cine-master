@@ -2,6 +2,8 @@
 
 namespace Core;
 
+use Exception;
+
 /**
  * Model Class
  * - Initialize the database connection
@@ -17,15 +19,52 @@ abstract class Model
 {
     protected $db;
     protected $table;
+    protected $schema;
     
     /**
-     * Initialize the database connection
+     * Initialize the database connection and set schema of the table
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($schema)
     {
         $this->db = new Database;
+        $this->schema = $schema;
+    }
+
+    /**
+     * Return schema of the table
+     * 
+     * @param ?array $fields
+     * @return array
+     * @throws Exception
+     */
+    public function getSchema(...$fields)
+    {
+        if ($fields) {
+            $schema = [];
+            foreach ($fields as $field) {
+                if (array_key_exists($field, $this->schema)) {
+                    $schema[$field] = $this->schema[$field];
+                } else {
+                    throw new Exception("Field $field does not exist in schema");
+                }
+            }
+            return $schema;
+        }
+        return $this->schema;
+    }
+
+    /**
+     * Return schema of required fields
+     * 
+     * @return array
+     */
+    public function getRequiredSchema()
+    {
+        return array_filter($this->schema, function ($value) {
+            return strpos($value, 'required') !== false;
+        });
     }
     
     /**

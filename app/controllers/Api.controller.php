@@ -61,6 +61,14 @@ class Api extends Controller
             // set response code
             Request::setResponseCode($e->getCode() ?? 500);
 
+            // exit(json_encode([
+            //     'status' => 'error',
+            //     'message' => $e->getMessage()
+            // ]));
+            // die(json_encode([
+            //     'status' => 'error',
+            //     'message' => $e->getMessage()
+            // ]));
             echo json_encode([
                 'status' => 'error',
                 'message' => $e->getMessage()

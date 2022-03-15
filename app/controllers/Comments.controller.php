@@ -36,7 +36,7 @@ class Comments extends Controller
         try {
             switch (true) {
                 case empty($data):
-                    throw new Exception('Post data is not specified');
+                    throw new Exception('Comment data is not specified');
                 case !isset($data['post_id']):
                     throw new Exception('Post ID is not specified');
                 case !isset($data['author_id']):

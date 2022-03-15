@@ -77,7 +77,10 @@ class Users extends Controller
         if ($user) {
             if (password_verify($password, $user->password)) {
                 unset($user->password);
-                session_start();
+                // Start Session
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
                 $_SESSION['user'] = serialize($user);
                 Router::redirect('/');
             } else {
@@ -100,7 +103,7 @@ class Users extends Controller
     {
         extract($data);
 
-        if (!isset($username) || !isset($email) || !isset($password) || !isset($password_confirm) || empty($username) || empty($email) || empty($password) || empty($password_confirm)) {
+        if (!isset($username) || !isset($email) || !isset($password) || !isset($password_confirm) || !isset($avatar) || empty($username) || empty($email) || empty($password) || empty($password_confirm) || empty($avatar)) {
             $error = "Please fill all fields";
             $this->view('users/register', compact('error'));
             exit;
@@ -154,7 +157,10 @@ class Users extends Controller
      */
     public function logout()
     {
-        session_start();
+        // Start Session
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         session_destroy();
         Router::redirect('/');
     }
@@ -167,7 +173,10 @@ class Users extends Controller
      */
     public function profile()
     {
-        session_start();
+        // Start Session
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         if (isset($_SESSION['user'])) {
             $user = unserialize($_SESSION['user']);
             $posts = $this->model('Post')->getAllBy('author_id', $user->id);
@@ -201,7 +210,10 @@ class Users extends Controller
             if (!$user) {
                 throw new Exception('User does not exist');
             } else {
-                session_start();
+                // Start Session
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
                 $this->view('users/editProfile', compact('user'));
             }
         } catch (Exception $e) {
@@ -245,7 +257,10 @@ class Users extends Controller
                         // update session user
                         $user = $this->model->get($id);
                         unset($user->password);
-                        session_start();
+                        // Start Session
+                        if (session_status() == PHP_SESSION_NONE) {
+                            session_start();
+                        }
                         $_SESSION['user'] = serialize($user);
                         Router::redirect('/profile');
                     } else {

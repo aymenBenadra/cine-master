@@ -16,7 +16,7 @@ class Posts extends Controller
     private $model;
 
     /**
-     * Initialize Post model
+     * Set the model to use
      *
      * @return void
      */
@@ -34,7 +34,10 @@ class Posts extends Controller
     {
         $posts = $this->model->getAll() ?? [];
 
-        session_start();
+        // Start Session
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         $this->view('posts/index', compact('posts'));
     }
 
@@ -57,7 +60,10 @@ class Posts extends Controller
 
             $posts = $this->model->getAllBy("category_id", $cat);
 
-            session_start();
+            // Start Session
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
+            }
             $this->view('posts/index', compact('posts', 'cat'));
         } catch (Exception $e) {
             echo $e->getMessage();
@@ -85,11 +91,14 @@ class Posts extends Controller
                 // Getting comments for this post
                 $comments = $this->model('Comment')->getAllBy('post_id', $data['id']);
 
-                if(!$comments) {
+                if (!$comments) {
                     $comments = [];
                 }
 
-                session_start();
+                // Start Session
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
                 $this->view('posts/show', compact('post', 'comments'));
             }
         } catch (Exception $e) {
@@ -104,7 +113,10 @@ class Posts extends Controller
      */
     public function create()
     {
-        session_start();
+        // Start Session
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
         $this->view('posts/create');
     }
 
@@ -126,7 +138,10 @@ class Posts extends Controller
             if (!$post) {
                 throw new Exception('Post does not exist');
             } else {
-                session_start();
+                // Start Session
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
                 $this->view('posts/edit', compact('post'));
             }
         } catch (Exception $e) {

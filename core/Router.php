@@ -3,6 +3,7 @@
 namespace Core;
 
 use Exception;
+use Core\Helpers\Request;
 
 /**
  * Router Class
@@ -46,67 +47,126 @@ class Router
      * Register a GET route.
      *
      * @param string $uri
-     * @param string $controller
+     * @param string $route
+     * @param array $middlewares
      * @return void
      */
-    public function get($uri, $controller)
+    public function get($uri, $route, $middlewares = [])
     {
-        $this->routes['GET'][$uri] = $controller;
+        $this->routes['GET'][$uri] = [
+            'route' => $route,
+            'middlewares' => $middlewares
+        ];
     }
 
     /**
      * Register a POST route.
      *
      * @param string $uri
-     * @param string $controller
+     * @param string $route
+     * @param array $middlewares
      * @return void
      */
-    public function post($uri, $controller)
+    public function post($uri, $route, $middlewares = [])
     {
-        $this->routes['POST'][$uri] = $controller;
+        $this->routes['POST'][$uri] = [
+            'route' => $route,
+            'middlewares' => $middlewares
+        ];
     }
 
     /**
      * Register a PUT route.
      *
      * @param string $uri
-     * @param string $controller
+     * @param string $route
+     * @param array $middlewares
+     * @return void
      */
-    public function put($uri, $controller)
+    public function put($uri, $route, $middlewares = [])
     {
-        $this->routes['PUT'][$uri] = $controller;
+        $this->routes['PUT'][$uri] = [
+            'route' => $route,
+            'middlewares' => $middlewares
+        ];
     }
 
     /**
      * Register a DELETE route.
      *
      * @param string $uri
-     * @param string $controller
+     * @param string $route
+     * @param array $middlewares
+     * @return void
      */
-    public function delete($uri, $controller)
+    public function delete($uri, $route, $middlewares = [])
     {
-        $this->routes['DELETE'][$uri] = $controller;
+        $this->routes['DELETE'][$uri] = [
+            'route' => $route,
+            'middlewares' => $middlewares
+        ];
     }
 
     /**
-     * Load the requested URI's associated controller method.
+     * Load the requested URI's associated controller method and middleware.
      *
-     * @param string $uri
-     * @param string $requestType
-     * @param array $data
+     * @param Request $request
      */
-    public function direct($uri, $requestType, $data)
+    public function direct($request)
     {
-        if (array_key_exists($uri, $this->routes[$requestType])) {
-            $uri = explode('@', $this->routes[$requestType][$uri]);
+        if (array_key_exists($request->uri, $this->routes[$request->method])) {
+            $uri = explode('@', $this->routes[$request->method][$request->uri]['route']);
+
+            // Load the controller
+            $controller = "App\\Controllers\\{$uri[0]}";
+            $method = $uri[1];
+
+            // Load the middlewares
+            $middlewares = $this->routes[$request->method][$request->uri]['middlewares'] ?? [];
+
+            // Call the Middlewares and stop the execution if one of them returns false
+            if (count($middlewares) > 0) {
+                foreach ($middlewares as $middleware) {
+                    if (!$this->callMiddleware($middleware, $request)) {
+                        return;
+                    }
+                }
+            }
+
+            $controller = new $controller;
+
             return $this->callAction(
-                $uri[0],
-                $uri[1],
-                $data
+                $controller,
+                $method,
+                $request->data
             );
         }
 
         return $this->callAction("Pages", "notFound", []);
+    }
+
+    /**
+     * Load and call Middlewares
+     * 
+     * @param string $middleware
+     * @return void
+     */
+    public function callMiddleware($middleware)
+    {
+        $middleware = explode('@', $middleware);
+        $param = $middleware[1];
+
+        $middleware = "Core\\Middlewares\\{$middleware[0]}";
+
+        // Instantiate the middleware class
+        $middleware = new $middleware;
+
+        // Call the middleware method
+        if($param) {
+            return $middleware->handle($param);
+        } else {
+            return $middleware->handle();
+        }
     }
 
     /**
@@ -118,13 +178,17 @@ class Router
      */
     protected function callAction($controller, $action, $data)
     {
-        $controllerName = "App\\Controllers\\{$controller}";
-        $controller = new $controllerName;
+        $controller = new $controller;
 
         if (!method_exists($controller, $action)) {
             throw new Exception(
-                "{$controllerName} does not respond to the {$action} action."
+                "{$controller} does not respond to the {$action} action."
             );
+        }
+
+        // Start Session
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
         }
 
         if (empty($data)) {
@@ -141,10 +205,26 @@ class Router
      */
     public static function redirect($uri, $data = [], $statusCode = 302)
     {
-        if(!empty($data)) {
+        if (!empty($data)) {
             $uri .= '?' . http_build_query($data);
         }
-        header("Location: {$uri}" , true, $statusCode);
+        http_response_code($statusCode);
+        header("Location: {$uri}", true, $statusCode);
         exit;
     }
+
+    /**
+     * Abort the execution of the script with a given status code and message.
+     * 
+     * @param int $statusCode
+     * @param string $message
+     * @return void
+     */
+    public static function abort($statusCode, $message)
+    {
+        http_response_code($statusCode);
+        exit($message);
+    }
+
+
 }

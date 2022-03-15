@@ -28,6 +28,22 @@ abstract class Controller
     }
 
     /**
+     * Call the middlewares with the data and model schema to handle
+     * 
+     * @param array $middlewares
+     * @param array $data
+     * @return void
+     */
+    public function callMiddlewares($middlewares, $data)
+    {
+        foreach ($middlewares as $middleware) {
+            $middleware = "App\\Middlewares\\{$middleware}";
+            $middleware = new $middleware();
+            $data = $middleware->handle($data);
+        }
+    }
+
+    /**
      * Load View with data
      *
      * @param  mixed $view

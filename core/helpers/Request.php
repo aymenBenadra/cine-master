@@ -13,6 +13,21 @@ namespace Core\Helpers;
  */
 class Request
 {
+    public $uri;
+    public $method;
+    public $data;
+
+    /**
+     * Create a new Request instance from the current request.
+     * 
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->uri = self::uri();
+        $this->method = self::method();
+        $this->data = self::data();
+    }
     /**
      * Fetch the request URI.
      *

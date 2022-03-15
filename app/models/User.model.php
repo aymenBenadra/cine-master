@@ -15,7 +15,14 @@ class User extends Model
 {
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct([
+            'id' => 'int',
+            'username' => 'required|string|min:3|max:45',
+            'email' => 'required|email|min:10|max:100',
+            'password' => 'required|string|min:6|max:45',
+            'admin' => 'bool',
+            'avatar' => 'required|string'
+        ]);
         $this->table = 'Users';
     }
 }

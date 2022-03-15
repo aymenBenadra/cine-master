@@ -8,24 +8,24 @@
  * - POST Routes
  */
 // Login page
-$router->get('login', 'Users@login'); // ✅
+$router->get('login', 'Users@login', ['Auth@guest']); // ✅
 // Register page
-$router->get('register', 'Users@register'); // ✅
+$router->get('register', 'Users@register', ['Auth@guest']); // ✅
 // Profile page
-$router->get('profile', 'Users@profile'); // ✅
+$router->get('profile', 'Users@profile', ['Auth@user']); // ✅
 // Profile edit page
-$router->get('profile/edit', 'Users@edit'); // ✅
+$router->get('profile/edit', 'Users@edit', ['Auth@user']); // ✅
 // Logout page
-$router->get('logout', 'Users@logout'); // ✅
+$router->get('logout', 'Users@logout', ['Auth@user']); // ✅
 
 // Login user and redirect to home page if success or to login page if failed with error message
-$router->post('signin', 'Users@signin'); // ✅
+$router->post('signin', 'Users@signin', ['Auth@guest', 'Validation@login|password']); // ✅
 // Register user and redirect to login page if success or redirect to register page if failed with error message
-$router->post('signup', 'Users@signup'); // ✅
+$router->post('signup', 'Users@signup', ['Auth@guest', 'Validation@username|email|password|password_confirm|avatar']); // ✅
 // Profile update
-$router->post('profile/update', 'Users@update'); // ✅
+$router->post('profile/update', 'Users@update', ['Auth@user', 'Validation@id|username|email|avatar']); // ✅
 // profile destroy
-$router->post('profile/destroy', 'Users@destroy'); // ✅
+$router->post('profile/destroy', 'Users@destroy', ['Auth@user', 'Validation@id']); // ✅
 /**
  * *Posts Controller
  * path: app\controllers\Posts.controller.php
@@ -38,18 +38,18 @@ $router->get('', 'Posts@index'); // ✅
 // Go to Posts by Category page
 $router->get('category', 'Posts@category'); // ✅
 // Create new Post page
-$router->get('post/create', 'Posts@create'); // ✅
+$router->get('post/create', 'Posts@create', ['Auth@user']); // ✅
 // Show Post Details
-$router->get('post', 'Posts@show'); // ✅
+$router->get('post', 'Posts@show', ['Verification@id']); // ✅
 // Edit Post page
-$router->get('post/edit', 'Posts@edit'); // ✅
+$router->get('post/edit', 'Posts@edit', ['Auth@user', 'Verification@id']); // ✅
 
 // Store new post
-$router->post('post/store', 'Posts@store'); // ✅
+$router->post('post/store', 'Posts@store', ['Auth@user', 'Verification@title|photo|description|category_id']); // ✅
 // Update post by ID
-$router->post('post/update', 'Posts@update'); // ✅
+$router->post('post/update', 'Posts@update', ['Auth@user', 'Verification@id|title|photo|description|category_id']); // ✅
 // Delete post by ID
-$router->post('post/destroy', 'Posts@destroy'); // ✅
+$router->post('post/destroy', 'Posts@destroy', ['Auth@user', 'Verification@id']); // ✅
 // Like or unlike post by ID
 // $router->post('post/like', 'Posts@like');
 
@@ -63,9 +63,9 @@ $router->post('post/destroy', 'Posts@destroy'); // ✅
  */
 
  // Add comment to post by ID
-$router->post('comment/store', 'Comments@store'); // ✅
+$router->post('comment/store', 'Comments@store', ['Auth@user', 'Verification@post_id|author_id|content']); // ✅
 // Delete comment by ID
-$router->post('comment/destroy', 'Comments@destroy'); // ✅
+$router->post('comment/destroy', 'Comments@destroy', ['Auth@user', 'Verification@id']); // ✅
 
 /**
  * *API Routes

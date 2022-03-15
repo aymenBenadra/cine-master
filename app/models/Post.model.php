@@ -16,7 +16,16 @@ class Post extends Model
 {
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct([
+            'id' => 'int',
+            'author_id' => 'required|int',
+            'title' => 'required|string|min:3|max:100',
+            'photo' => 'required|string',
+            'description' => 'required|string|min:3|max:1000',
+            'category_id' => 'required|int',
+            'created_at' => 'date',
+            'updated_at' => 'date'
+        ]);
         $this->table = 'Posts';
     }
 }

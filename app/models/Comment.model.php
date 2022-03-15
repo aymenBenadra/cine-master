@@ -16,7 +16,13 @@ class Comment extends Model
 {
     public function __construct()
     {
-        parent::__construct();
+        parent::__construct([
+            'id' => 'int',
+            'post_id' => 'required|int',
+            'author_id' => 'required|int',
+            'content' => 'required|string',
+            'created_at' => 'date'
+        ]);
         $this->table = 'Comments';
     }
 }
