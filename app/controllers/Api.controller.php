@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use Core\Controller;
+use Core\{Controller, Router};
 use Core\Helpers\Request;
 use Exception;
 
@@ -90,13 +90,13 @@ class Api extends Controller
             $post = $this->model('Post')->get($id);
 
             if (!$post) {
-                throw new Exception('Post not found', 404);
+                Router::abort(404, 'Post not found');
             }
 
-            echo json_encode([
+            die(json_encode([
                 'status' => 'success',
                 'data' => $post
-            ]);
+            ]));
         } catch (Exception $e) {
             // set response code
             Request::setResponseCode($e->getCode() ?? 500);

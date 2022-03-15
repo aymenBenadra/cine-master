@@ -16,7 +16,7 @@ class User extends Model
     public function __construct()
     {
         parent::__construct([
-            'id' => 'int',
+            'id' => 'numeric',
             'username' => 'required|string|min:3|max:45',
             'email' => 'required|email|min:10|max:100',
             'password' => 'required|string|min:6|max:45',

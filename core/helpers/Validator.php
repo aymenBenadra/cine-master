@@ -117,22 +117,20 @@ class Validator
      */
     public static function min($value, $min)
     {
-        switch (gettype($value)) {
-            case 'string':
+        switch (true) {
+            case is_string($value):
                 if (strlen($value) <= $min) {
                     return 'The value must be at least ' . $min . ' characters long';
                 }
                 break;
 
-            case 'array':
+            case is_array($value):
                 if (count($value) <= $min) {
                     return 'The value must be at least ' . $min . ' items long';
                 }
                 break;
 
-            case 'integer':
-            case 'double':
-            case 'float':
+            case is_numeric($value):
                 if ($value <= $min) {
                     return 'The value must be at least ' . $min;
                 }
@@ -155,22 +153,20 @@ class Validator
      */
     public static function max($value, $max)
     {
-        switch (gettype($value)) {
-            case 'string':
+        switch (true) {
+            case is_string($value):
                 if (strlen($value) >= $max) {
                     return 'The value must be at most ' . $max . ' characters long';
                 }
                 break;
 
-            case 'array':
+            case is_array($value):
                 if (count($value) >= $max) {
                     return 'The value must be at most ' . $max . ' items long';
                 }
                 break;
 
-            case 'integer':
-            case 'double':
-            case 'float':
+            case is_numeric($value):
                 if ($value >= $max) {
                     return 'The value must be at most ' . $max;
                 }

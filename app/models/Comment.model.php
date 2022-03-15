@@ -17,9 +17,9 @@ class Comment extends Model
     public function __construct()
     {
         parent::__construct([
-            'id' => 'int',
-            'post_id' => 'required|int',
-            'author_id' => 'required|int',
+            'id' => 'numeric',
+            'post_id' => 'required|numeric',
+            'author_id' => 'required|numeric',
             'content' => 'required|string',
             'created_at' => 'date'
         ]);

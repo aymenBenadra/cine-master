@@ -40,16 +40,16 @@ $router->get('category', 'Posts@category'); // ✅
 // Create new Post page
 $router->get('post/create', 'Posts@create', ['Auth@user']); // ✅
 // Show Post Details
-$router->get('post', 'Posts@show', ['Verification@id']); // ✅
+$router->get('post', 'Posts@show', ['Validation@id']); // ✅
 // Edit Post page
-$router->get('post/edit', 'Posts@edit', ['Auth@user', 'Verification@id']); // ✅
+$router->get('post/edit', 'Posts@edit', ['Auth@user', 'Validation@id']); // ✅
 
 // Store new post
-$router->post('post/store', 'Posts@store', ['Auth@user', 'Verification@title|photo|description|category_id']); // ✅
+$router->post('post/store', 'Posts@store', ['Auth@user', 'Validation@title|photo|description|category_id']); // ✅
 // Update post by ID
-$router->post('post/update', 'Posts@update', ['Auth@user', 'Verification@id|title|photo|description|category_id']); // ✅
+$router->post('post/update', 'Posts@update', ['Auth@user', 'Validation@id|title|photo|description|category_id']); // ✅
 // Delete post by ID
-$router->post('post/destroy', 'Posts@destroy', ['Auth@user', 'Verification@id']); // ✅
+$router->post('post/destroy', 'Posts@destroy', ['Auth@user', 'Validation@id']); // ✅
 // Like or unlike post by ID
 // $router->post('post/like', 'Posts@like');
 
@@ -63,9 +63,9 @@ $router->post('post/destroy', 'Posts@destroy', ['Auth@user', 'Verification@id'])
  */
 
  // Add comment to post by ID
-$router->post('comment/store', 'Comments@store', ['Auth@user', 'Verification@post_id|author_id|content']); // ✅
+$router->post('comment/store', 'Comments@store', ['Auth@user', 'Validation@post_id|author_id|content']); // ✅
 // Delete comment by ID
-$router->post('comment/destroy', 'Comments@destroy', ['Auth@user', 'Verification@id']); // ✅
+$router->post('comment/destroy', 'Comments@destroy', ['Auth@user', 'Validation@id']); // ✅
 
 /**
  * *API Routes
@@ -81,7 +81,7 @@ $router->get('api', 'Api@index'); // ✅
 // Get all posts
 $router->get('api/posts', 'Api@posts'); // ✅
 // Get post by ID
-$router->get('api/post', 'Api@post'); // ✅
+$router->get('api/post', 'Api@post', ['Validation@id']); // ✅
 // Get all posts by category ID
 $router->get('api/posts/category', 'Api@postsByCategory'); // ✅
 // Get all posts by user ID

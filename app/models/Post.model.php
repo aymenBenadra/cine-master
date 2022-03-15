@@ -17,12 +17,12 @@ class Post extends Model
     public function __construct()
     {
         parent::__construct([
-            'id' => 'int',
-            'author_id' => 'required|int',
+            'id' => 'numeric',
+            'author_id' => 'required|numeric',
             'title' => 'required|string|min:3|max:100',
             'photo' => 'required|string',
             'description' => 'required|string|min:3|max:1000',
-            'category_id' => 'required|int',
+            'category_id' => 'required|numeric',
             'created_at' => 'date',
             'updated_at' => 'date'
         ]);
