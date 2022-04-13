@@ -28,22 +28,6 @@ abstract class Controller
     }
 
     /**
-     * Call the middlewares with the data and model schema to handle
-     * 
-     * @param array $middlewares
-     * @param array $data
-     * @return void
-     */
-    public function callMiddlewares($middlewares, $data)
-    {
-        foreach ($middlewares as $middleware) {
-            $middleware = "App\\Middlewares\\{$middleware}";
-            $middleware = new $middleware();
-            $data = $middleware->handle($data);
-        }
-    }
-
-    /**
      * Load View with data
      *
      * @param  mixed $view
@@ -59,7 +43,7 @@ abstract class Controller
             require_once APPROOT . "/views/$view.view.php";
         } else {
             // View does not exist
-            throw new Exception('View does not exist');
+            Router::abort(404, "View '$view' does not exist.");
         }
     }
 
@@ -75,7 +59,7 @@ abstract class Controller
         $extension = pathinfo($data['name'], PATHINFO_EXTENSION);
 
         if (!in_array($extension, $allowedExtensions)) {
-            throw new Exception('Photo extension is not valid');
+            Router::abort(400, 'Invalid file extension');
         }
 
         // generate a unique file name
@@ -84,7 +68,7 @@ abstract class Controller
         $path = 'assets/uploads/' . $fileName;
 
         if (!move_uploaded_file($data['tmp_name'], $path)) {
-            throw new Exception('Arrgh! Something went wrong');
+            Router::abort(500, 'Error uploading file');
         }
 
         return $fileName;
