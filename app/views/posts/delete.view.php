@@ -1,6 +1,5 @@
 <?php
 require_once APPROOT . '/views/includes/header.php';
-
 ?>
 
 <form action="/public/post/destroy" method="post">
@@ -9,7 +8,5 @@ require_once APPROOT . '/views/includes/header.php';
 </form>
 
 <?php
-echo APPROOT;
 require_once APPROOT . '/views/includes/footer.php';
-
 ?>

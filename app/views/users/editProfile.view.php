@@ -7,10 +7,10 @@ extract($data); ?>
     <?php require_once APPROOT . '/views/includes/navbar.php'; ?>
     <section class="profile-edit">
         <h1 class="profile-edit__header">Edit Profile</h1>
-        <form action="/profile/update" method="POST" enctype="multipart/form-data" class="profile-edit__form">
+        <form action="/profile/update" method="POST" enctype="multipart/form-data" class="profile-edit__form" onsubmit="changeAvatar()">
             <input type="hidden" name="id" value="<?= $user->id ?>">
             <input type="text" class="form-control profile-edit__input" value="<?= $user->username ?>" placeholder="Username" name="username" id="username" required />
-            <input type="file" class="form-control profile-edit__input profile-edit__input--file" onchange="preview()" id="photo" name="avatar">
+            <input type="file" class="form-control profile-edit__input profile-edit__input--file" onchange="preview()" id="avatar" name="avatar" value="<?= $user->avatar ?>">
             <div class="preview preview--profile d-block" id="preview">
                 <img id="frame" src="/assets/uploads/<?= $user->avatar ?>" class="img-fluid" />
             </div>
@@ -30,6 +30,8 @@ extract($data); ?>
             </div>
         </form>
     </section>
+
+    <?php require_once APPROOT . '/views/includes/footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
     <script src="/js/script.js"></script>
