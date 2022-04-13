@@ -43,7 +43,7 @@ class Validator
         if (empty($errors)) {
             return true;
         }
-        
+
         return $errors;
     }
 
@@ -119,19 +119,19 @@ class Validator
     {
         switch (true) {
             case is_string($value):
-                if (strlen($value) <= $min) {
+                if (strlen($value) <= (int)$min) {
                     return 'The value must be at least ' . $min . ' characters long';
                 }
                 break;
 
             case is_array($value):
-                if (count($value) <= $min) {
+                if (count($value) <=  (int)$min) {
                     return 'The value must be at least ' . $min . ' items long';
                 }
                 break;
 
             case is_numeric($value):
-                if ($value <= $min) {
+                if ($value <=  (int)$min) {
                     return 'The value must be at least ' . $min;
                 }
                 break;
@@ -154,21 +154,20 @@ class Validator
     public static function max($value, $max)
     {
         switch (true) {
+            case is_numeric($value):
+                if ($value >=  (int)$max) {
+                    return 'The value must be at most ' . $max;
+                }
+                break;
             case is_string($value):
-                if (strlen($value) >= $max) {
+                if (strlen($value) >=  (int)$max) {
                     return 'The value must be at most ' . $max . ' characters long';
                 }
                 break;
 
             case is_array($value):
-                if (count($value) >= $max) {
+                if (count($value) >=  (int)$max) {
                     return 'The value must be at most ' . $max . ' items long';
-                }
-                break;
-
-            case is_numeric($value):
-                if ($value >= $max) {
-                    return 'The value must be at most ' . $max;
                 }
                 break;
 
@@ -265,6 +264,42 @@ class Validator
     {
         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
             return 'The value must be an email';
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if value is a POST File and return error if not.
+     * 
+     * @param mixed $value
+     * @return string
+     */
+    public static function file($value)
+    {
+        if (!is_array($value) || !isset($value['tmp_name'])) {
+            return 'The value must be a file';
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if value is an Image File and return error if not.
+     * 
+     * @param mixed $value
+     * @return string
+     */
+    public static function image($value)
+    {
+        if (!is_array($value) || !isset($value['tmp_name'])) {
+            return 'The value must be an image';
+        }
+
+        $image = getimagesize($value['tmp_name']);
+
+        if (!$image) {
+            return 'The value must be an image';
         }
 
         return true;

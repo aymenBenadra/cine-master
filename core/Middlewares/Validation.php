@@ -4,7 +4,6 @@ namespace Core\Middlewares;
 
 use Core\Helpers\Request;
 use Core\Helpers\Validator;
-use Core\Router;
 
 /**
  * Verification class

@@ -7,6 +7,7 @@
  * - GET Routes
  * - POST Routes
  */
+
 // Login page
 $router->get('login', 'Users@login', ['Auth@guest']); // ✅
 // Register page
@@ -45,9 +46,9 @@ $router->get('post', 'Posts@show', ['Validation@id']); // ✅
 $router->get('post/edit', 'Posts@edit', ['Auth@user', 'Validation@id']); // ✅
 
 // Store new post
-$router->post('post/store', 'Posts@store', ['Auth@user', 'Validation@title|photo|description|category_id']); // ✅
+$router->post('post/store', 'Posts@store', ['Auth@user', 'Validation@title|photo|description|category_id|author_id']); // ✅
 // Update post by ID
-$router->post('post/update', 'Posts@update', ['Auth@user', 'Validation@id|title|photo|description|category_id']); // ✅
+$router->post('post/update', 'Posts@update', ['Auth@user', 'Validation@id|title|photo|description|category_id|author_id']); // ✅
 // Delete post by ID
 $router->post('post/destroy', 'Posts@destroy', ['Auth@user', 'Validation@id']); // ✅
 // Like or unlike post by ID
@@ -83,16 +84,16 @@ $router->get('api/posts', 'Api@posts'); // ✅
 // Get post by ID
 $router->get('api/post', 'Api@post', ['Validation@id']); // ✅
 // Get all posts by category ID
-$router->get('api/posts/category', 'Api@postsByCategory'); // ✅
+$router->get('api/posts/category', 'Api@postsByCategory', ['Validation@cat']); // ✅
 // Get all posts by user ID
-$router->get('api/posts/user', 'Api@postsByUser');
+$router->get('api/posts/user', 'Api@postsByUser', ['Validation@id']);
 
 // Create new post
-$router->post('api/post', 'Api@store');
+$router->post('api/post', 'Api@storePost', ['Validation@author_id|title|photo|description|category_id']); // ✅
 // Update post by ID
-$router->put('api/post', 'Api@update');
+$router->put('api/post', 'Api@updatePost');
 // Delete post by ID
-$router->delete('api/post', 'Api@destroy');
+$router->delete('api/post', 'Api@destroyPost');
 
 // Get all comments by post ID
 $router->get('api/comments', 'Api@comments');
@@ -100,4 +101,3 @@ $router->get('api/comments', 'Api@comments');
 $router->post('api/comment', 'Api@storeComment');
 // Delete comment by ID
 $router->delete('api/comment', 'Api@destroyComment');
-
