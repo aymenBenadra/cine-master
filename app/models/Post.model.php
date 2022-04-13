@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Core\Model;
-use PDO;
 
 /**
  * Post Model
@@ -20,7 +19,7 @@ class Post extends Model
             'id' => 'numeric',
             'author_id' => 'required|numeric',
             'title' => 'required|string|min:3|max:100',
-            'photo' => 'required|string',
+            'photo' => 'required|image',
             'description' => 'required|string|min:3|max:1000',
             'category_id' => 'required|numeric',
             'created_at' => 'date',

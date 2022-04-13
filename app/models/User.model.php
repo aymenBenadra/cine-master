@@ -21,7 +21,7 @@ class User extends Model
             'email' => 'required|email|min:10|max:100',
             'password' => 'required|string|min:6|max:45',
             'admin' => 'bool',
-            'avatar' => 'required|string'
+            'avatar' => 'required|image',
         ]);
         $this->table = 'Users';
     }
