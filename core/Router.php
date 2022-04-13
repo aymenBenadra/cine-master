@@ -2,8 +2,8 @@
 
 namespace Core;
 
-use Exception;
 use Core\Helpers\Request;
+use Exception;
 
 /**
  * Router Class
@@ -127,8 +127,8 @@ class Router
             // Call the Middlewares and stop the execution if one of them returns false
             if (count($middlewares) > 0) {
                 foreach ($middlewares as $middleware) {
-                    if (!$this->callMiddleware($middleware, $request)) {
-                        return;
+                    if (!$this->callMiddleware($middleware)) {
+                        self::abort(400, 'Bad Request');
                     }
                 }
             }
@@ -225,6 +225,4 @@ class Router
         http_response_code($statusCode);
         exit($message);
     }
-
-
 }
