@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use Core\{Controller, Router};
-use Exception;
 
 /**
  * Comments Controller
@@ -33,25 +32,10 @@ class Comments extends Controller
      */
     public function store($data = [])
     {
-        try {
-            switch (true) {
-                case empty($data):
-                    throw new Exception('Comment data is not specified');
-                case !isset($data['post_id']):
-                    throw new Exception('Post ID is not specified');
-                case !isset($data['author_id']):
-                    throw new Exception('Author ID is not specified');
-                case !isset($data['content']):
-                    throw new Exception('Comment content is not specified');
-            }
-
-            if (!$this->model->add($data)) {
-                throw new Exception('Arrgh! Something went wrong');
-            } else {
-                Router::redirect('/post?id=' . $data['post_id']);
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
+        if (!$this->model->add($data)) {
+            Router::abort(500, 'Error while saving comment');
+        } else {
+            Router::redirect('/post?id=' . $data['post_id']);
         }
     }
 
@@ -63,23 +47,10 @@ class Comments extends Controller
      */
     public function destroy($data = [])
     {
-        try {
-            if (empty($data)){
-                if(!isset($data['id'])) {
-                throw new Exception('Comment ID is not specified');
-                }
-                else if(!isset($data['post_id'])) {
-                throw new Exception('Post ID is not specified');
-                }
-            }
-
-            if (!$this->model->delete($data['id'])) {
-                throw new Exception('Arrgh! Something went wrong');
-            } else {
-                Router::redirect('/post?id=' . $data['post_id']);
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
+        if (!$this->model->delete($data['id'])) {
+            Router::abort(500, 'Error while deleting comment');
+        } else {
+            Router::redirect('/post?id=' . $data['post_id']);
         }
     }
 }

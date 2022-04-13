@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use Core\{Controller, Router};
-use Exception;
 
 /**
  * Posts Controller
@@ -48,25 +47,18 @@ class Posts extends Controller
      */
     public function category($data = [])
     {
-        try {
-            if (empty($data) || !isset($data['cat'])) {
-                throw new Exception('Posts Category is not specified');
-            }
-            extract($data);
+        extract($data);
 
-            if ($cat != 1 && $cat != 2) {
-                throw new Exception('Category ID is not valid');
-            }
+        $posts = $this->model->getAllBy("category_id", $cat);
 
-            $posts = $this->model->getAllBy("category_id", $cat);
-
+        if ($posts) {
             // Start Session
             if (session_status() == PHP_SESSION_NONE) {
                 session_start();
             }
             $this->view('posts/index', compact('posts', 'cat'));
-        } catch (Exception $e) {
-            echo $e->getMessage();
+        } else {
+            Router::redirect('/posts');
         }
     }
 
@@ -78,31 +70,23 @@ class Posts extends Controller
      */
     public function show($data = [])
     {
-        try {
-            if (empty($data) || !isset($data['id'])) {
-                throw new Exception('Post ID is not specified');
+        $post = $this->model->get($data['id']);
+
+        if (!$post) {
+            Router::abort(404, 'Post not found');
+        } else {
+            // Getting comments for this post
+            $comments = $this->model('Comment')->getAllBy('post_id', $data['id']);
+
+            if (!$comments) {
+                $comments = [];
             }
 
-            $post = $this->model->get($data['id']);
-
-            if (!$post) {
-                throw new Exception('Post does not exist');
-            } else {
-                // Getting comments for this post
-                $comments = $this->model('Comment')->getAllBy('post_id', $data['id']);
-
-                if (!$comments) {
-                    $comments = [];
-                }
-
-                // Start Session
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
-                $this->view('posts/show', compact('post', 'comments'));
+            // Start Session
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
             }
-        } catch (Exception $e) {
-            echo $e->getMessage();
+            $this->view('posts/show', compact('post', 'comments'));
         }
     }
 
@@ -128,24 +112,16 @@ class Posts extends Controller
      */
     public function edit($data = [])
     {
-        try {
-            if (empty($data) || !isset($data['id'])) {
-                throw new Exception('Post ID is not specified');
-            }
+        $post = $this->model->get($data['id']);
 
-            $post = $this->model->get($data['id']);
-
-            if (!$post) {
-                throw new Exception('Post does not exist');
-            } else {
-                // Start Session
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
-                $this->view('posts/edit', compact('post'));
+        if (!$post) {
+            Router::abort(404, 'Post not found');
+        } else {
+            // Start Session
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
             }
-        } catch (Exception $e) {
-            echo $e->getMessage();
+            $this->view('posts/edit', compact('post'));
         }
     }
 
@@ -157,29 +133,12 @@ class Posts extends Controller
      */
     public function store($data = [])
     {
-        try {
-            switch (true) {
-                case empty($data):
-                    throw new Exception('Post data is not specified');
-                case !isset($data['title']):
-                    throw new Exception('Post title is not specified');
-                case !isset($data['photo']):
-                    throw new Exception('Post photo is not specified');
-                case !isset($data['description']):
-                    throw new Exception('Post description is not specified');
-                case !isset($data['category_id']):
-                    throw new Exception('Post category is not specified');
-            }
+        $data['photo'] = $this->uploadPhoto($data['photo']);
 
-            $data['photo'] = $this->uploadPhoto($data['photo']);
-
-            if (!$this->model->add($data)) {
-                throw new Exception('Arrgh! Something went wrong');
-            } else {
-                Router::redirect('/post?id=' . $this->model->getLastInsertedId());
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
+        if (!$this->model->add($data)) {
+            Router::abort(500, 'Error while creating post');
+        } else {
+            Router::redirect('/post?id=' . $this->model->getLastInsertedId());
         }
     }
 
@@ -191,32 +150,16 @@ class Posts extends Controller
      */
     public function update($data = [])
     {
-        try {
-            switch (true) {
-                case empty($data):
-                    throw new Exception('Post data is not specified');
-                case !isset($data['title']):
-                    throw new Exception('Post title is not specified');
-                case !isset($data['photo']):
-                    throw new Exception('Post photo is not specified');
-                case !isset($data['description']):
-                    throw new Exception('Post description is not specified');
-                case !isset($data['category_id']):
-                    throw new Exception('Post category is not specified');
-            }
 
-            $data['photo'] = $this->uploadPhoto($data['photo']);
+        $data['photo'] = $this->uploadPhoto($data['photo']);
 
-            $id = $data['id'];
-            unset($data['id']);
+        $id = $data['id'];
+        unset($data['id']);
 
-            if (!$this->model->update($id, $data)) {
-                throw new Exception('Arrgh! Something went wrong');
-            } else {
-                Router::redirect('/post?id=' . $id);
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
+        if (!$this->model->update($id, $data)) {
+            Router::abort(500, 'Error while updating post');
+        } else {
+            Router::redirect('/post?id=' . $id);
         }
     }
 
@@ -228,18 +171,10 @@ class Posts extends Controller
      */
     public function destroy($data = [])
     {
-        try {
-            if (empty($data) || !isset($data['id'])) {
-                throw new Exception('Post ID is not specified');
-            }
-
-            if (!$this->model->delete($data['id'])) {
-                throw new Exception('Arrgh! Something went wrong');
-            } else {
-                Router::redirect('/');
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
+        if (!$this->model->delete($data['id'])) {
+            Router::abort(500, 'Error while deleting post');
+        } else {
+            Router::redirect('/');
         }
     }
 }

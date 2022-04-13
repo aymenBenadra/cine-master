@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use Core\{Controller, Router};
-use Exception;
 
 /**
  * Users Controller
@@ -65,11 +64,6 @@ class Users extends Controller
     {
         extract($data);
 
-        if (!isset($login) || !isset($password) || empty($login) || empty($password)) {
-            $error = "Please fill all fields";
-            $this->view('users/login', compact('error'));
-        }
-
         $field = str_contains($login, '@') ? 'email' : 'username';
 
         $user = $this->model->getBy($field, $login);
@@ -84,12 +78,10 @@ class Users extends Controller
                 $_SESSION['user'] = serialize($user);
                 Router::redirect('/');
             } else {
-                $error = "Wrong password";
-                $this->view('users/login', compact('error'));
+                Router::redirect('/login', ['error' => 'Wrong password']);
             }
         } else {
-            $error = "Username or password is incorrect";
-            $this->view('users/login', compact('error'));
+            Router::redirect('/login', ['error' => 'User not found']);
         }
     }
 
@@ -103,33 +95,21 @@ class Users extends Controller
     {
         extract($data);
 
-        if (!isset($username) || !isset($email) || !isset($password) || !isset($password_confirm) || !isset($avatar) || empty($username) || empty($email) || empty($password) || empty($password_confirm) || empty($avatar)) {
-            $error = "Please fill all fields";
-            $this->view('users/register', compact('error'));
-            exit;
-        }
-
         if ($password !== $password_confirm) {
-            $error = "Passwords do not match";
-            $this->view('users/register', compact('error'));
-            exit;
+            Router::redirect('/users/register', compact(['error' => 'Passwords do not match']));
         }
 
         // Check if user with same username or email exists
         $user = $this->model->getBy('email', $email);
 
         if ($user) {
-            $error = "Email is already taken";
-            $this->view('users/register', compact('error'));
-            exit;
+            Router::redirect('/users/register', compact(['error' => 'Email is already taken']));
         }
 
         $user = $this->model->getBy('username', $username);
 
         if ($user) {
-            $error = "Username is already taken";
-            $this->view('users/register', compact('error'));
-            exit;
+            Router::redirect('/users/register', compact(['error' => 'Username is already taken']));
         }
 
         $user = $this->model->add([
@@ -144,9 +124,7 @@ class Users extends Controller
             $status = true;
             Router::redirect('login', compact('status'));
         } else {
-            $error = "Arrgh! Something went wrong";
-            $this->view('users/register', compact('error'));
-            exit;
+            Router::redirect('/users/register', compact(['error' => 'Something went wrong']));
         }
     }
 
@@ -193,31 +171,26 @@ class Users extends Controller
     /**
      * Go to User edit page
      *
-     * @param  mixed $data
      * @return void
      */
-    public function edit($data = [])
+    public function edit()
     {
-        try {
-            if (empty($data) || !isset($data['id'])) {
-                throw new Exception('User ID is not specified');
+        // Start Session
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        $user = unserialize($_SESSION['user']);
+
+        $user = $this->model->get($user->id);
+
+        if (!$user) {
+            Router::abort(404, 'User not found');
+        } else {
+            // Start Session
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
             }
-
-            extract($data);
-
-            $user = $this->model->get($id);
-
-            if (!$user) {
-                throw new Exception('User does not exist');
-            } else {
-                // Start Session
-                if (session_status() == PHP_SESSION_NONE) {
-                    session_start();
-                }
-                $this->view('users/editProfile', compact('user'));
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
+            $this->view('users/editProfile', compact('user'));
         }
     }
 
@@ -229,47 +202,29 @@ class Users extends Controller
      */
     public function update($data = [])
     {
-        try {
-            if (empty($data['id']) || !isset($data['id'])) {
-                throw new Exception('User ID is not specified');
-            } else if (!isset($data['username']) || empty($data['username'])) {
-                throw new Exception('User username is not specified');
-            } else if (!isset($data['email']) || empty($data['email'])) {
-                throw new Exception('User email is not specified');
+        $user = $this->model->get($data['id']);
+
+        $data['avatar'] = $this->uploadPhoto($data['avatar']);
+
+        if (!$user) {
+            Router::abort(404, 'User not found');
+        } else {
+            $id = $data['id'];
+            unset($data['id']);
+
+            if ($this->model->update($id, $data)) {
+                // update session user
+                $user = $this->model->get($id);
+                unset($user->password);
+                // Start Session
+                if (session_status() == PHP_SESSION_NONE) {
+                    session_start();
+                }
+                $_SESSION['user'] = serialize($user);
+                Router::redirect('/profile');
             } else {
-
-                $user = $this->model->get($data['id']);
-
-                // handle avatar upload if exists in data array and update user
-                if (isset($data['avatar'])) {
-                    $data['avatar'] = $this->uploadPhoto($data['avatar']);
-                } else {
-                    $data['avatar'] = $user->avatar;
-                }
-
-                if (!$user) {
-                    throw new Exception('User does not exist');
-                } else {
-                    $id = $data['id'];
-                    unset($data['id']);
-
-                    if ($this->model->update($id, $data)) {
-                        // update session user
-                        $user = $this->model->get($id);
-                        unset($user->password);
-                        // Start Session
-                        if (session_status() == PHP_SESSION_NONE) {
-                            session_start();
-                        }
-                        $_SESSION['user'] = serialize($user);
-                        Router::redirect('/profile');
-                    } else {
-                        throw new Exception('User could not be updated');
-                    }
-                }
+                Router::abort(500, 'Something went wrong');
             }
-        } catch (Exception $e) {
-            echo $e->getMessage();
         }
     }
 
@@ -281,20 +236,10 @@ class Users extends Controller
      */
     public function destroy($data = [])
     {
-        try {
-            if (empty($data) || !isset($data['id'])) {
-                throw new Exception('User ID is not specified');
-            }
-
-            extract($data);
-
-            if (!$this->model->delete($id)) {
-                throw new Exception('Arrgh! Something went wrong');
-            } else {
-                Router::redirect('/register');
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
+        if (!$this->model->delete($data['id'])) {
+            Router::abort(500, 'Something went wrong');
+        } else {
+            Router::redirect('/logout');
         }
     }
 }
